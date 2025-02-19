@@ -18,18 +18,23 @@ def main():
         # Step 1: Parse user input using OpenAI-powered planner
         parsed_data = parse_math_problem(user_input)
 
-        if "error" in parsed_data:
-            print(json.dumps({"error": parsed_data["error"]}, indent=2))
-            continue
+        # If cached solution exists, use it
+        if "cached" in parsed_data and parsed_data["cached"]:
+            cached_solution = parsed_data["solution"]
+            result = cached_solution
+        else:
+            if "error" in parsed_data:
+                print(json.dumps({"error": parsed_data["error"]}, indent=2))
+                continue
 
-        operation, num1, num2 = parsed_data["operation"], parsed_data["num1"], parsed_data["num2"]
+            operation, num1, num2 = parsed_data["operation"], parsed_data["num1"], parsed_data["num2"]
 
-        # Step 2: Execute the operation using redundant computation
-        result = execute_operation(operation, num1, num2)
+            # Step 2: Execute the operation using redundant computation
+            result = execute_operation(operation, num1, num2)
 
-        if "error" in result:
-            print(json.dumps({"error": result["error"]}, indent=2))
-            continue
+            if "error" in result:
+                print(json.dumps({"error": result["error"]}, indent=2))
+                continue
 
         # Step 3: Run error detection to check for failures
         failure_check = detect_failure([result["result"]])
@@ -37,7 +42,7 @@ def main():
         # Step 4: Output structured JSON response
         final_output = {
             "input": user_input,
-            "parsed": parsed_data,
+            "parsed": parsed_data if "cached" not in parsed_data else "Cached result used",
             "computed_result": result,
             "failure_analysis": failure_check
         }

@@ -1,15 +1,19 @@
+import json
 import openai
 import os
-import json
 from dotenv import load_dotenv
+from src.utils.vector_db import find_similar_problem, store_solution
 
-load_dotenv()  # Load OpenAI API key from .env
-
+load_dotenv()
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 
 def parse_math_problem(user_input):
-    """Uses OpenAI API to parse a natural language math problem and extract structured data."""
+    """Uses OpenAI API to parse a math problem, but first checks VDB for reuse."""
+
+    cached_solution = find_similar_problem(user_input)
+    if cached_solution:
+        return {"cached": True, "solution": cached_solution}
 
     system_prompt = """
     You are an AI assistant designed to extract structured data from natural language math problems.
@@ -33,17 +37,7 @@ def parse_math_problem(user_input):
             ]
         )
 
-        response_text = response.choices[0].message.content.strip()
-
-        # Ensure the response is valid JSON
-        try:
-            parsed_response = json.loads(response_text)
-            return parsed_response
-        except json.JSONDecodeError:
-            return {"error": "Invalid response format from OpenAI."}
-
-    except openai.OpenAIError as e:
-        return {"error": f"OpenAI API error: {str(e)}"}
-
+        parsed_response = json.loads(response.choices[0].message.content)
+        return parsed_response
     except Exception as e:
-        return {"error": f"Unexpected error: {str(e)}"}
+        return {"error": f"Failed to parse input: {str(e)}"}

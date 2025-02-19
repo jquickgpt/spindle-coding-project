@@ -1,11 +1,12 @@
 from src.tools.math_tools import (
     sum_numbers, delta_numbers, product_numbers,
-    quotient_numbers, modulo_numbers, unreliable_tool
+    quotient_numbers, modulo_numbers
 )
+from src.utils.vector_db import store_solution
 
 
 def execute_operation(operation, a, b, trials=100):
-    """Executes a mathematical operation multiple times and uses majority voting to determine the result."""
+    """Executes an operation multiple times, stores in VDB, and returns the most common result."""
 
     operations = {
         "sum": sum_numbers,
@@ -31,4 +32,10 @@ def execute_operation(operation, a, b, trials=100):
     # Return the most common result
     final_result = max(set(filtered_results), key=filtered_results.count)
 
-    return {"operation": operation, "num1": a, "num2": b, "result": final_result}
+    # Store problem and result in VDB
+    problem = f"{a} {operation} {b}"
+    solution = {"operation": operation, "num1": a,
+                "num2": b, "result": final_result}
+    store_solution(problem, solution)
+
+    return solution

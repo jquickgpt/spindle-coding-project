@@ -19,14 +19,22 @@ def evaluate():
     for user_input, expected in test_cases:
         parsed_data = parse_math_problem(user_input)
 
+        # Handle errors from planner
         if "error" in parsed_data:
             results.append(
                 {"input": user_input, "error": parsed_data["error"]})
             continue
 
+        # Ensure required keys exist before unpacking
+        if not all(k in parsed_data for k in ["operation", "num1", "num2"]):
+            results.append(
+                {"input": user_input, "error": "Missing keys in parsed response."})
+            continue
+
         operation, num1, num2 = parsed_data["operation"], parsed_data["num1"], parsed_data["num2"]
         computed_result = execute_operation(operation, num1, num2)
 
+        # Handle execution errors
         if "error" in computed_result:
             results.append(
                 {"input": user_input, "error": computed_result["error"]})
