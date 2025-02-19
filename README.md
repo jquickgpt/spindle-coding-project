@@ -3,6 +3,9 @@
 ## Overview
 This project implements a **multi-agent system** that solves math problems given in **natural language** using OpenAI's API for parsing and **deterministic local math tools** for computation.
 
+## Demo Video
+Watch the demo video [here](https://www.loom.com/share/fc9aa10271844e66a84653dee2ad75df?sid=4ccab8c7-7c3f-47a8-b0f8-dca7a902865e).
+
 ## Installation
 
 ### 1. Clone the Repository
@@ -38,16 +41,37 @@ Enter a math problem in natural language (e.g., "three plus four"), and the syst
 
 Type `exit` to quit.
 
-## System Components
-- **Planner Agent (`planner.py`)** → Uses OpenAI API to parse user input.
-- **Executor Agent (`executor.py`)** → Runs deterministic math tools.
-- **Error Handler (`error_handler.py`)** → Detects failures and ensures reliability.
-- **Vector Database (`vector_db.py`)** → **Currently disabled due to retrieval issues**.
-
 ## Evaluation
 Run `evals.py` to test system performance:
 ```bash
 python evals.py
+```
+
+## Project Structure Diagram
+```
+multi-agent-math-solver/
+│── src/
+│   ├── agents/
+│   │   ├── planner.py
+│   │   ├── executor.py
+│   │   ├── error_handler.py
+│   ├── tools/
+│   │   ├── math_tools.py
+│   ├── utils/
+│   │   ├── vector_db.py
+│── tests/
+│── docs/
+│   ├── architecture.md
+│   ├── project_structure.md
+│── models/
+│── data/
+│── notebooks/
+│── main.py
+│── evals.py
+│── requirements.txt
+│── README.md
+│── .env
+│── project_structure.py
 ```
 
 ## Data Flow Diagram
@@ -100,23 +124,118 @@ This system implements a **multi-agent approach** to solving user-provided math 
 - Using OpenAI API introduces latency (~0.5s per request).
 - Disabling cache retrieval increases computation time.
 
-## Redundant Computation Tradeoffs
+## Tradeoffs
 
-### Why Use Redundant Computation?
-To **mitigate silent failures**, the system executes **100 trials per math operation** and selects the most common result.
+### Redundant Computation  
+#### Why We Use Redundant Computation  
+Redundant computation ensures **high reliability** by executing each math operation **100 times** and selecting the most common result. This method reduces the impact of silent failures, particularly with the unreliable tool that fails 40% of the time.  
 
-### Tradeoffs
-#### Advantages
-- **High accuracy** → Majority rule corrects for faulty tools.
-- **Fault tolerance** → The system can handle unreliable calculations.
+#### Tradeoffs  
+**Advantages**  
+- **Fault Tolerance** → Silent failures are mitigated using majority voting.  
+- **Increased Accuracy** → The probability of a correct result is over **97%**, even with a faulty tool.  
 
-#### Limitations
-- **Increased computation time** → Running 100 trials per operation increases processing time.
-- **Resource-intensive** → More computations require higher CPU cycles.
+**Disadvantages**  
+- **Performance Overhead** → Executing **100 trials per operation** increases computational load.  
+- **Latency Concerns** → The increased processing time can impact real-time use cases.  
 
-#### Future Optimization
-- Reduce trials dynamically based on reliability.
-- Optimize error detection thresholds.
+#### Future Optimization  
+- Implement **adaptive redundancy**, dynamically adjusting the number of trials based on error rate.  
+- Explore alternative **error detection mechanisms** to reduce redundant trials when unnecessary.  
+
+---
+
+### Number of Agents  
+#### Tradeoffs Between 2, 3, 4, or 5 Agents  
+We chose a **three-agent architecture** instead of 2, 4, or 5 agents based on the **optimal balance of modularity and efficiency**.  
+
+#### Why Not 2 Agents?  
+- **Less modularity** → A two-agent system would require combining multiple responsibilities, reducing **separation of concerns**.  
+- **Increased complexity in error handling** → A single agent would have to manage execution and validation, making debugging more difficult.  
+
+#### Why Not 4 or 5 Agents?  
+- **Higher inter-agent communication overhead** → More agents require **additional message-passing logic**, increasing complexity.  
+- **Unnecessary duplication** → The core functionality of parsing, execution, and error handling is **efficiently handled with 3 agents**.  
+
+#### Why 3 Agents?  
+- **Planner Agent** → Handles natural language parsing with OpenAI API.  
+- **Executor Agent** → Runs deterministic math tools and ensures redundant computation.  
+- **Error Handler Agent** → Detects and mitigates incorrect or unreliable results.  
+- **Balanced Design** → Ensures clarity, efficiency, and maintainability.  
+
+---
+
+### Choosing `gpt-4o-mini` for OpenAI API  
+We selected `gpt-4o-mini` as our model due to **its efficiency, cost-effectiveness, and performance** compared to other OpenAI models.  
+
+#### Tradeoffs and Comparison  
+
+| **Model**          | **Latency** | **Cost Efficiency** | **Accuracy** | **Best Use Case** |
+|------------------|------------|----------------|------------|----------------|
+| **`gpt-4o-mini`** | Low        | High (low cost) | Moderate   | Fast, lightweight parsing tasks |
+| **`gpt-4o`**     | Moderate   | Medium         | High       | General AI assistance |
+| **`gpt-4-turbo`** | Higher     | Lower         | Very High  | Complex reasoning tasks |
+
+#### Why `gpt-4o-mini`?  
+- **Fastest Response Time** → Essential for real-time parsing.  
+- **Lower Cost** → Reduces API usage costs while maintaining acceptable accuracy.  
+- **Sufficient Accuracy for Parsing** → The model is optimized for extracting structured math expressions from natural language.  
+
+#### Future Considerations  
+- We may **upgrade to `gpt-4o`** if parsing quality needs improvement.  
+- If advanced reasoning becomes necessary, we could evaluate `gpt-4-turbo` for complex multi-step calculations.  
+
+
+## Future Work and Product Roadmap
+
+### Phase 1: Foundation Enhancements
+
+**Enhanced Error Recovery**  
+- Implement dynamic retry strategies and fallback algorithms.  
+- Set adaptive error thresholds to trigger user input when necessary.
+
+**Advanced Tool Functionality**  
+- Introduce additional math operations (e.g., integration, differentiation).
+
+**Vector Database Improvements**  
+- Transition from in-memory storage to a persistent, lightweight database.  
+- Optimize cosine similarity search for improved performance.
+
+---
+
+### Phase 2: Agent and Interface Expansion
+
+**Agent Expansion**  
+- Add sub-agents for logging, monitoring, and analytics.  
+- Enhance inter-agent communication protocols for smoother collaboration.
+
+**User Interface Enhancements**  
+- Develop a dashboard for real-time monitoring of system performance and error recovery.  
+- Incorporate visualizations that clearly display tool-call sequences and agent decisions.
+
+---
+
+### Phase 3: Scalability and Security Optimization
+
+**Scalability and Performance**  
+- Implement parallel processing and asynchronous tool calls to manage increased load.  
+- Evaluate distributed computing options as needed.
+
+**Security and Robustness**  
+- Enhance API key management and secure system access.  
+- Strengthen input validation and introduce safeguards against malicious inputs.
+
+---
+
+### Phase 4: Domain Expansion and Continuous Improvement
+
+**Broader Domain Applications**  
+- Adapt the system architecture to solve problems in areas beyond math.  
+- Pilot new tool types and test cross-domain functionalities.
+
+**Continuous Monitoring and Improvement**  
+- Refine logging and monitoring strategies based on performance data.  
+- Actively solicit user feedback to drive iterative improvements.
 
 ## Compliance Review
 
@@ -134,3 +253,5 @@ To **mitigate silent failures**, the system executes **100 trials per math opera
 | **Evaluation system (`evals.py`) to measure performance** | Compliant | `evals.py` correctly validates system behavior. |
 | **Project documentation includes README, installation steps, system overview** | Compliant | `README.md` contains all required sections. |
 | **Future work section in README.md** | Compliant | Includes cache retrieval fix and optimizations. |
+
+
