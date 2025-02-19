@@ -4,7 +4,7 @@
 This project implements a **multi-agent system** that solves math problems given in **natural language** using OpenAI's API for parsing and **deterministic local math tools** for computation.
 
 ## Demo Video
-Watch the demo video [here](https://www.loom.com/share/fc9aa10271844e66a84653dee2ad75df?sid=4ccab8c7-7c3f-47a8-b0f8-dca7a902865e).
+Watch the demo video [here](https://www.loom.com/share/8e739cbb2108453297701999ed843e81?sid=abe5739f-abe1-4d6f-adee-6dffed3baae0).
 
 ## Installation
 
