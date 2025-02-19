@@ -42,6 +42,7 @@ Type `exit` to quit.
 - **Planner Agent (`planner.py`)** – Uses OpenAI API to parse user input.
 - **Executor Agent (`executor.py`)** – Runs deterministic math tools with redundant computation.
 - **Error Handler (`error_handler.py`)** – Detects failures and ensures reliability.
+- **Vector Database (`vector_db.py`)** – Currently disabled due to retrieval issues.
 
 ## Evaluation
 Run `evals.py` to test system performance:
@@ -49,6 +50,11 @@ Run `evals.py` to test system performance:
 python evals.py
 ```
 
-## Future Work
-- Optimize vector database for caching previously solved problems.
-- Expand agent capabilities to handle multi-step calculations.
+## Known Issues
+- **Cache Retrieval Disabled:** The system currently does not retrieve cached results due to incorrect FAISS mapping. This will be fixed in a future version.
+
+## Next Steps / Future Work
+- **Fix Cache Retrieval:** Ensure correct FAISS index mapping to properly store and retrieve problem embeddings.
+- **Optimize Vector Database:** Improve storage efficiency and retrieval performance.
+- **Enable Multi-Step Calculations:** Expand system capabilities beyond single operations.
+- **Performance Improvements:** Reduce API calls through better caching and batch processing.
