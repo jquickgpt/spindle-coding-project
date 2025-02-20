@@ -1,4 +1,4 @@
-# Multi-Agent Math Solver
+# Spindle Coding Project
 
 ## Overview
 This project implements a **multi-agent system** that solves math problems given in **natural language** using OpenAI's API for parsing and **deterministic local math tools** for computation.
