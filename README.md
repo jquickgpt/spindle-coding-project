@@ -1,7 +1,7 @@
 # Spindle Coding Project
 
 ## Overview
-This project implements a **multi-agent system** that solves math problems given in **natural language** using OpenAI's API for parsing and **deterministic local math tools** for computation.
+This project implements a **multi-agent system** that solves math problems given in **natural language** using OpenAI's API for parsing and **deterministic local math tools** for computation. Read the project instructions [here](https://github.com/jquickgpt/spindle-coding-project/blob/main/spindle_coding_project.md).
 
 ## Demo Video
 Watch the demo video [here](https://www.loom.com/share/8e739cbb2108453297701999ed843e81?sid=abe5739f-abe1-4d6f-adee-6dffed3baae0).
