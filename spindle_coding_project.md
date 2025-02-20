@@ -1,5 +1,6 @@
 
-# Spindle Coding Project for AI Engineer
+# Spindle Coding Project for AI Engineer (Lead/Principal IC)
+## Agents, Agentic Systems & Applied LLMs
 
 # 🎯 Your Mission
 
